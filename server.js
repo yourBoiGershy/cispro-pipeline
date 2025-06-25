@@ -28,9 +28,24 @@ app.post('/deploy', (req, res) => {
     'Access-Control-Allow-Origin': '*',
   });
 
+  // Determine which command to run based on platform
+  const isWindows = process.platform === 'win32';
+  let command, args;
+  
+  if (isWindows) {
+    command = 'cmd.exe';
+    args = ['/c', 'deploy.bat'];
+  } else {
+    command = 'sh';
+    args = ['./deploy.sh'];
+  }
+  
+  console.log(`Executing: ${command} ${args.join(' ')}`);
+  
   // Execute the deploy script
-  const deployScript = spawn('bash', ['./deploy.sh'], {
-    cwd: __dirname
+  const deployScript = spawn(command, args, {
+    cwd: __dirname,
+    shell: true
   });
 
   // Send output line by line
