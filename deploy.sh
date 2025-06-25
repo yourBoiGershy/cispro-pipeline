@@ -116,6 +116,24 @@ cd ../backend
 if [ $? -eq 0 ]; then
     echo "✓ Navigated back to backend directory"
 
+    # Stop any existing processes on port 4000
+    echo "Stopping any existing processes on port 4000..."
+    PORT_PID=$(lsof -ti:4000)
+    if [ ! -z "$PORT_PID" ]; then
+        echo "Found process(es) running on port 4000: $PORT_PID"
+        kill -9 $PORT_PID
+        if [ $? -eq 0 ]; then
+            echo "✓ Successfully stopped existing processes on port 4000"
+        else
+            echo "✗ Failed to stop processes on port 4000"
+            exit 1
+        fi
+        # Wait a moment for the port to be freed
+        sleep 1
+    else
+        echo "✓ No existing processes found on port 4000"
+    fi
+
     echo "Starting backend with npm start..."
     npm start &
     BACKEND_PID=$!
